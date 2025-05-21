@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inicio de Sesión</title>
+  <link rel="icon" href="img/yasy.jpeg">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <link rel="stylesheet" href="dt/datatables.min.css">
+
+  <link rel="stylesheet" href="bt-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="bt/bootstrap.min.css">
+  <script src="bt/bootstrap.min.js"></script>
+
+  <link rel="stylesheet" href="alert/alertify.min.css">
+  <link rel="stylesheet" href="alert/themes/default.min.css">
+  <script src="alert/alertify.min.js"></script>
+</head>
+<body class="bg-body-secondary">
+  <div class="loader">
+    <h1 id="greeting">Bienvenido a Casa Yasy S.A</h1>
+  </div>
+
+  <div class="body2">
+    <div class="card col-md-6 border-primary  mx-auto mt-5">
+      <div class="form-container login-form">
+        <h2>Iniciar Sesión</h2>
+        <p align="center"class="sombra" ><img src="img/ORIG-LOGO-CASA-YASY-50-años-PNG.png"
+           width="200px" alt="Giro infinito" class="giro-infinito"></p>
+      </div>
+  
+      <div class="card-body">
+        <form class="row g-3 needs-validation mt-2" id="login" novalidate>
+          <div class="input-group col-md-6">
+            <span class="input-group-text"><i class="bi bi-person-square"></i></span>
+            <input type="text" class="form-control" id="usuario" placeholder="Usuario" value="" required>
+            <div class="invalid-feedback">
+                !Ingrese el usuario!
+            </div>
+          </div>
+          <div class="input-group col-md-6">
+            <span class="input-group-text"><i class="bi bi-key-fill"></i></i></span>
+            <input type="password" class="form-control" id="contrasena" placeholder="Contraseña" value="" required>
+            <div class="invalid-feedback">
+                !Ingrese la contraseña!
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="col-6 d-grid mx-auto">
+              <button class="btn btn-success" type="submit"><i class="bi bi-unlock-fill"></i> Ingresar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+  
+      <div class="card-footer">
+        <label id="mensaje"></label>
+      </div>
+  </div>
+
+  <div class="text-center mt-5">
+    <button class="btn btn-success btn-sm" title="Ver la base de datos" data-bs-toggle="modal" data-bs-target="#verBD" onclick="verBD()"><i class="bi bi-eye"></i></button>
+    <button class="btn btn-primary btn-sm" title="Cargar la base de datos" onclick="cargarBD()"><i class="bi bi-database-add"></i></button>
+    <button class="btn btn-warning btn-sm" title="Vaciar la base de datos" onclick="vaciarBD()"><i class="bi bi-trash"></i></button>
+  </div>
+
+
+<!-- Ver la Base de datos -->
+  <div class="modal fade" id="verBD" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalCenteredScrollableTitle">Ver la Base de Datos</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="h6">Los datos que se visualizan se encuentran en el localStorage</p>
+          <p class="fw-bold text-primary">USUARIOS</p>
+          <table id="tabla_usuarios" class="display compact" style="width:100%">
+            <thead>
+              <tr>
+                <th>Id Usuario</th>
+                <th>N° Cédula</th>
+                <th>Nombre</th>
+                <th>Celular</th>
+                <th>Usuario</th>
+                <th>Contraseña</th>
+                <th>Cargo</th>
+              </tr>
+            </thead>
+
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  
+  
+
+  <script src="js/app.js"></script>
+  <script src="js/bdP.js"></script>
+  <!-- Datatables -->
+  <script src="dt/jquery-3.7.1.js"></script>
+  <script src="dt/datatables.min.js"></script>
+  <script src="dt/es-ES.js"></script>
+
+  <script>
+    (()=>{
+      'use strict'
+
+      const forms=document.querySelectorAll('.needs-validation')
+
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event =>{
+          if(!form.checkValidity()){
+            event.preventDefault()
+            event.stopPropagation()
+          }
+
+          form.classList.add('was-validated')
+        }, false)
+      })
+    })()
+
+    document.getElementById("login").addEventListener("submit", function(e){
+      e.preventDefault();
+
+      const usuarioIngresado=document.getElementById("usuario").value;
+      const passwordIngresado=document.getElementById("contrasena").value;
+
+      if(usuarioIngresado != "" && passwordIngresado != ""){
+
+        const datosGuardados = localStorage.getItem("usuarios");
+        const usuarios = JSON.parse(datosGuardados) || [];
+
+        const usuarioEncontrado = usuarios.find(
+          (u) => u.usuario === usuarioIngresado && u.contrasena === passwordIngresado
+        );
+
+        const mensaje = document.getElementById("mensaje");
+        if (!usuarioEncontrado) {
+          mensaje.textContent = "Usuario o contraseña incorrectos.";
+          mensaje.style.color = "blue";
+          document.getElementById("usuario").focus();
+          setTimeout(function() { //Mostrar el mensaje de error por 2 segundos
+            mensaje.textContent = "";
+          }, 2000);
+        }else{
+          localStorage.setItem("nomUsuario", usuarioEncontrado.nombre);
+          localStorage.setItem("rolUsuario", usuarioEncontrado.rol);
+          localStorage.setItem("idUsuario", usuarioEncontrado.idusuario);
+          sessionStorage.setItem("sesionActiva","true");
+          window.location.href = "menu.html";
+        }
+      }
+    });
+
+    //-----------------------------------------------------
+    function cargarBD(){
+      datos();
+      alertify.success("Base de datos original cargada");
+    }
+    //-----------------------------------------------------
+    function vaciarBD(){
+      localStorage.clear();
+      alertify.error("Base de datos eliminada");
+    }
+    //-----------------------------------------------------
+    function verBD(){
+      var usuarios= JSON.parse(localStorage.getItem("usuarios")) || [];
+
+      if($.fn.DataTable.isDataTable("#tabla_usuarios")){
+        $('#tabla_usuarios').DataTable().clear().destroy();
+      }
+
+      tabla= new DataTable("#tabla_usuarios",{
+        data: usuarios,
+        columns:[
+          {data: 'idusuario', title: 'ID Usuario'},
+          {data: 'cedula', title: 'Cedula de Identidad'},
+          {data: 'nombre', title: 'Nombre'},
+          {data: 'celular', title: 'Celular'},
+          {data: 'usuario', title: 'Usuario'},
+          {data: 'contrasena', title: 'Contraseña'},
+          {data: 'rol', title: 'Cargo'}
+        ],
+        language: spanish,
+        searching: false,    
+        lengthChange: false, 
+        pageLength: 5 
+      });
+    }
+    //-----------------------------------------------------
+
+
+  </script>
+   
+</body>
+</html>
